@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if movie %}{{ movie.Title }} – Results{% elif category %}{{ category }} Movies{% else %}Results{% endif %} · MovieFlix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="ambient-glow"></div>
+
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </a>
+        <nav class="header-nav">
+            <a href="/">Home</a>
+            <a href="/category/Action">Movies</a>
+        </nav>
+    </div>
+</header>
+
+<!-- SEARCH BAR (compact) -->
+<div class="results-search-bar">
+    <div class="search-wrapper compact">
+        <form action="/search" method="POST" class="search-form">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="movie" placeholder="Search again…" autocomplete="off">
+                <button type="submit" class="search-btn">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- BACK BUTTON -->
+<div class="back-row">
+    <button onclick="history.back()" class="back-btn">← Back</button>
+    {% if category %}
+    <div class="page-crumb">Browse / <span class="accent">{{ category }}</span></div>
+    {% elif movie %}
+    <div class="page-crumb">Results for / <span class="accent">{{ movie.Title }}</span></div>
+    {% endif %}
+</div>
+
+<!-- ERROR STATE -->
+{% if error %}
+<div class="error-state">
+    <div class="error-icon">🎬</div>
+    <h2>{{ error }}</h2>
+    <p>Try a different title, genre, or director.</p>
+    <a href="/" class="btn-primary">← Back to Home</a>
+</div>
+{% endif %}
+
+<!-- SELECTED MOVIE CARD -->
+{% if movie %}
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">🎬 <span class="accent">Selected Movie</span></h2>
+    </div>
+
+    <div class="selected-movie-card">
+        <div class="selected-info">
+            <div class="selected-badge">SELECTED</div>
+            <h1 class="selected-title">{{ movie.Title }}</h1>
+            <div class="selected-meta">
+                {% if movie.Year %}<span class="meta-chip">📅 {{ movie.Year }}</span>{% endif %}
+                {% if movie.Rating %}<span class="meta-chip gold">⭐ {{ movie.Rating }}</span>{% endif %}
+                {% if movie.Duration %}<span class="meta-chip">🕐 {{ movie.Duration }} min</span>{% endif %}
+            </div>
+            {% if movie.Genres %}
+            <div class="genre-tags">
+                {% for g in movie.Genres.split('|') %}
+                    <span class="genre-tag">{{ g.strip() }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if movie.Overview %}
+            <p class="selected-overview">{{ movie.Overview }}</p>
+            {% endif %}
+        </div>
+        <div class="selected-right-col">
+            <div class="selected-score-ring">
+                <div class="ring-inner">
+                    <span class="ring-label">MATCH</span>
+                    <span class="ring-value">100%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CATEGORY HEADER -->
+{% if category %}
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">🎭 <span class="accent">{{ category }}</span> Movies</h2>
+        <p class="section-sub">Top picks in this genre</p>
+    </div>
+{% endif %}
+
+<!-- RECOMMENDATIONS -->
+{% if recommendations %}
+{% if movie %}
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">🔥 <span class="accent">Recommended</span> For You</h2>
+        <p class="section-sub">{{ recommendations|length }} titles matched</p>
+    </div>
+{% endif %}
+
+    <div class="movie-grid">
+        {% for m in recommendations %}
+        <div class="movie-card" style="--i: {{ loop.index }}">
+
+            <!-- Rank badge -->
+            <div class="rank-badge">#{{ loop.index }}</div>
+
+            <!-- Card body -->
+            <div class="card-body">
+                <h3 class="card-title">{{ m.Title }}</h3>
+
+                <div class="card-meta">
+                    {% if m.Year %}<span class="meta-pill">📅 {{ m.Year }}</span>{% endif %}
+                    {% if m.Rating %}<span class="meta-pill gold">⭐ {{ "%.1f"|format(m.Rating|float) if m.Rating else m.Rating }}</span>{% endif %}
+                    {% if m.Duration %}<span class="meta-pill">🕐 {{ m.Duration }} min</span>{% endif %}
+                </div>
+
+                {% if m.Genres %}
+                <div class="card-genres">
+                    {% for g in m.Genres.split('|')[:3] %}
+                        <span class="genre-mini">{{ g.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if m.Overview %}
+                <p class="card-overview">{{ m.Overview[:100] }}{% if m.Overview|length > 100 %}…{% endif %}</p>
+                {% endif %}
+            </div>
+
+            <!-- Score bar (if similarity score exists) -->
+            {% if m.Score is defined %}
+            <div class="score-bar-wrap">
+                <div class="score-label">Relevance</div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: {{ (m.Score * 100)|int }}%"></div>
+                </div>
+                <div class="score-pct">{{ "%.0f"|format(m.Score * 100) }}%</div>
+            </div>
+            {% endif %}
+
+            <!-- Hover overlay -->
+            <div class="card-hover-overlay">
+                <form action="/search" method="POST">
+                    <input type="hidden" name="movie" value="{{ m.Title }}">
+                    <button type="submit" class="btn-find-similar">Find Similar →</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% if category %}</section>{% endif %}
+{% if movie %}</section>{% endif %}
+{% endif %}
+
+<!-- EMPTY STATE -->
+{% if not recommendations and not error %}
+<div class="error-state">
+    <div class="error-icon">🔍</div>
+    <h2>No results found</h2>
+    <p>Try browsing categories instead.</p>
+    <a href="/" class="btn-primary">← Back to Home</a>
+</div>
+{% endif %}
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="logo small">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </div>
+        <p class="footer-copy">© 2025 MovieFlix · AI Recommendations</p>
+    </div>
+</footer>
+
+</body>
+</html>

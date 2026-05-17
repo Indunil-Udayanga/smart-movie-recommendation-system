@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.Title }} · MovieFlix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="ambient-glow"></div>
+
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </a>
+        <nav class="header-nav">
+            <a href="/">Home</a>
+        </nav>
+    </div>
+</header>
+
+<div class="back-row">
+    <button onclick="history.back()" class="back-btn">← Back</button>
+    <div class="page-crumb">Movie Detail / <span class="accent">{{ movie.Title }}</span></div>
+</div>
+
+<section class="section">
+    <div class="details-card">
+        <div class="details-header">
+            <h1 class="details-title">{{ movie.Title }}</h1>
+            <div class="details-meta">
+                {% if movie.Year %}<span class="meta-chip">📅 {{ movie.Year }}</span>{% endif %}
+                {% if movie.Rating %}<span class="meta-chip gold">⭐ {{ movie.Rating }}</span>{% endif %}
+                {% if movie.Genre %}<span class="meta-chip">🎭 {{ movie.Genre }}</span>{% endif %}
+            </div>
+        </div>
+        {% if movie.Overview %}
+        <div class="details-overview">
+            <h3 class="overview-label">Overview</h3>
+            <p>{{ movie.Overview }}</p>
+        </div>
+        {% endif %}
+        <div class="details-actions">
+            <form action="/search" method="POST">
+                <input type="hidden" name="movie" value="{{ movie.Title }}">
+                <button type="submit" class="btn-primary">Find Similar Movies</button>
+            </form>
+            <a href="/" class="btn-secondary">← Home</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-inner">
+        <div class="logo small">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </div>
+        <p class="footer-copy">© 2025 MovieFlix · AI Recommendations</p>
+    </div>
+</footer>
+
+</body>
+</html>

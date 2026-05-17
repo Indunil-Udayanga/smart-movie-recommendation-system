@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieFlix – Discover Your Next Film</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- Ambient background grain -->
+<div class="grain"></div>
+<div class="ambient-glow"></div>
+
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </div>
+        <nav class="header-nav">
+            <a href="/">Home</a>
+            <a href="/category/Action">Movies</a>
+            <a href="/category/Drama">Series</a>
+        </nav>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <p class="hero-eyebrow">AI-POWERED RECOMMENDATIONS</p>
+        <h1 class="hero-title">Find Your<br><span class="accent">Perfect Film</span></h1>
+        <p class="hero-sub">Search from thousands of titles. Get smart picks tailored to your taste.</p>
+
+        <div class="search-wrapper">
+            <form action="/search" method="POST" class="search-form">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="movie" placeholder="Search movies, directors, genres…" autocomplete="off" required>
+                    <button type="submit" class="search-btn">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="trending-tags">
+            <span class="tag-label">Trending:</span>
+            {% set trending = ["Inception", "Interstellar", "The Dark Knight", "Dune", "Avengers"] %}
+            {% for t in trending %}
+                <form action="/search" method="POST" style="display:inline">
+                    <input type="hidden" name="movie" value="{{ t }}">
+                    <button type="submit" class="trend-tag">{{ t }}</button>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <div class="film-strip">
+            <div class="strip-card" style="--delay:0s">🎬</div>
+            <div class="strip-card" style="--delay:0.3s">🎥</div>
+            <div class="strip-card" style="--delay:0.6s">🏆</div>
+            <div class="strip-card" style="--delay:0.9s">⭐</div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="stat"><span class="stat-num">50K+</span><span class="stat-label">Movies</span></div>
+    <div class="stat-div"></div>
+    <div class="stat"><span class="stat-num">200+</span><span class="stat-label">Genres</span></div>
+    <div class="stat-div"></div>
+    <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Powered</span></div>
+    <div class="stat-div"></div>
+    <div class="stat"><span class="stat-num">Free</span><span class="stat-label">Always</span></div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">Browse <span class="accent">Categories</span></h2>
+        <p class="section-sub">Explore movies by genre</p>
+    </div>
+
+    <div class="category-grid">
+        {% set cat_icons = {
+            "Action": ("💥", "#ff4b4b"),
+            "Comedy": ("😂", "#ffd700"),
+            "Drama": ("🎭", "#a78bfa"),
+            "Romance": ("❤️", "#f472b6"),
+            "Thriller": ("😱", "#fb923c"),
+            "Horror": ("👻", "#94a3b8"),
+            "Adventure": ("🗺️", "#34d399"),
+            "Sci-Fi": ("🚀", "#60a5fa"),
+            "Fantasy": ("✨", "#c084fc"),
+            "Crime": ("🔍", "#f59e0b"),
+            "Animation": ("🎨", "#4ade80"),
+            "Mystery": ("🕵️", "#818cf8")
+        } %}
+        {% for cat in categories %}
+        {% set icon_data = cat_icons.get(cat, ("🎬", "#e50914")) %}
+        <a href="/category/{{ cat }}" class="cat-card" style="--accent: {{ icon_data[1] }}">
+            <div class="cat-icon">{{ icon_data[0] }}</div>
+            <div class="cat-name">{{ cat }}</div>
+            <div class="cat-arrow">→</div>
+            <div class="cat-glow"></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="logo small">
+            <span class="logo-icon">▶</span>
+            <span class="logo-text">MOVIEFLIX</span>
+        </div>
+        <p class="footer-copy">© 2025 MovieFlix · AI Recommendations · Built with ❤️</p>
+    </div>
+</footer>
+
+</body>
+</html>
